@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="stock_picking_address_chainer" model="ir.ui.view">
+            <field name="name">stock.picking.address.chainer</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+            <data>
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Shipping Address</attribute>
+                </field>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="invoice_partner_id" string="Invoice Address"/>
+                    <field name="sale_partner_id"  string="Customer Address"/>
+                </xpath>
+            </data>
+            </field>
+        </record>
+    </data>
+</openerp>

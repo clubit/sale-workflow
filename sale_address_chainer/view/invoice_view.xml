@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record id="invoice_address_chainer" model="ir.ui.view">
+            <field name="name">invoice.address.chainer</field>
+            <field name="model">account.invoice</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="arch" type="xml">
+            <data>
+                <field name="partner_id" position="attributes">
+                    <attribute name="string">Invoice Address</attribute>
+                </field>
+                <xpath expr="//field[@name='partner_id']" position="after">
+                    <field name="picking_partner_id" string="Shipping Address"/>
+                    <field name="sale_partner_id"  string="Customer Address"/>
+                </xpath>
+            </data>
+            </field>
+        </record>
+    </data>
+</openerp>
