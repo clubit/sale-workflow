@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_sale_order_franco_check" model="ir.ui.view">
+            <field name="name">Confirm Sale Order</field>
+            <field name="model">sale.make.invoice</field>
+            <field name="arch" type="xml">
+                <form string="Confirm Sale Order (Franco)" version="7.0">
+                    <separator colspan="4" string="Do you want to confirm all quotations?" />
+                    <footer>
+                        <button name="confirm_sale_order_franco" string="Confirm" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel" />
+                    </footer>
+               </form>
+            </field>
+        </record>
+
+        <record id="action_sale_order_franco_check" model="ir.actions.act_window">
+            <field name="name">Confirm Sale Order (Franco)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">confirm.sale.order.franco</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_sale_order_franco_check"/>
+            <field name="target">new</field>
+            <field name="multi">True</field>
+        </record>
+
+        <record model="ir.values" id="sale_order_franco_check">
+            <field name="model_id" ref="sale.model_sale_order" />
+            <field name="name">Confirm Sale Order (Franco)</field>
+            <field name="key2">client_action_multi</field>
+            <field name="value" eval="'ir.actions.act_window,' + str(ref('action_sale_order_franco_check'))" />
+            <field name="key">action</field>
+            <field name="model">sale.order</field>
+        </record>
+    </data>
+</openerp>
