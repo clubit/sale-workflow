@@ -21,7 +21,7 @@
 ##############################################################################
 
 {
-    'name': 'clubit_franco_check',
+    'name': 'sale_franco_check',
     'version': '8.0',
     'category': 'Sale',
     'description': """
