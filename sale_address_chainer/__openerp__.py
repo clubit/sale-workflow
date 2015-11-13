@@ -22,7 +22,7 @@
  'category': 'Warehouse Management',
  'license': 'AGPL-3',
  'images': [],
- 'depends': ['sale_stock'],
+ 'depends': ['sale_stock','sale','stock','account'],
  'data': [
      'view/invoice_view.xml',
      'view/stock_view.xml',
