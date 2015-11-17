@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <record model="ir.cron" id="clubit_fixed_delivery_day_scheduler">
+      <field name="name">Schedule Deliveries Based on Fixed Delivery Day</field>
+      <field name="active" eval="True" />
+      <field name="interval_number">1</field>
+      <field name="interval_type">days</field>
+      <field name="numbercall">-1</field>
+      <field name="doall" eval="False" />
+      <field name="nextcall" eval="time.strftime('%Y-%m-%d %H:%M')" />
+      <field name="model">stock.picking</field>
+      <field name="function">_schedule_deliveries_with_fixed_day</field>
+      <field name="args">()</field>
+    </record>
+  </data>
+</openerp>

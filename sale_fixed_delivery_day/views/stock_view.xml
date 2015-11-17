@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="stock_picking_out_view" model="ir.ui.view">
+            <field name="name">stock.picking.fixed_delivery_day.form</field>
+            <field name="model">stock.picking</field>
+            <field name="inherit_id" ref="stock.view_picking_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='min_date']" position="after">
+                    <label for="fixed_delivery_day"/>
+                    <div>
+                        <field name="fixed_delivery_day" class="oe_inline"/>
+                        <button name="action_fixed_delivery_day" string="Update Scheduled Time" class="oe_link" type="object" groups="base.group_user" attrs="{'invisible':['|', ('fixed_delivery_day','=',False), ('state', '=', 'done')]}" help="Updates the Scheduled Time based on the Fixed Delivery Day field. Picks the first date in the future, but each click updates the date to the following fixed day +7 days"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
