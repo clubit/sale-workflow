@@ -1,4 +1,4 @@
-from openerp import fields
+from openerp import fields, api
 from openerp.osv import osv
 
 class stock_picking(osv.Model):
@@ -12,6 +12,16 @@ class stock_picking(osv.Model):
         if sale: inv_vals.update({'reference': sale.client_order_ref})
         return inv_vals
 
+    def _create_backorder(self, cr, uid, picking, backorder_moves=[], context=None):
+        result = super(stock_picking, self)._create_backorder(cr, uid, picking, backorder_moves, context)
+
+        if not result:
+            return result
+            
+        picking_db = self.pool.get('stock.picking')
+        picking_db.write(cr, uid, result, {'order_reference': picking.order_reference})
+        return result
+
 class stock_move(osv.Model):
     _inherit = "stock.move"
 
@@ -20,7 +30,3 @@ class stock_move(osv.Model):
         result.update({'order_reference': move.group_id and move.group_id.order_reference or False})
         return result
 
-    def _create_backorder(self, cr, uid, picking, backorder_moves=[], context=None):
-        result = super(stock_picking, self)._create_backorder(cr, uid, picking, backorder_moves=[], context=None)
-        result.order_reference = picking.order_reference
-        return result
