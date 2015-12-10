@@ -21,6 +21,6 @@ class stock_move(osv.Model):
         return result
 
     def _create_backorder(self, cr, uid, picking, backorder_moves=[], context=None):
-        result = super(stock_picking, self)._create_backorder(cr, uid, picking, backorder_moves=[], context=None):
+        result = super(stock_picking, self)._create_backorder(cr, uid, picking, backorder_moves=[], context=None)
         result.order_reference = picking.order_reference
         return result
