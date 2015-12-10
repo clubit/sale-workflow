@@ -19,3 +19,8 @@ class stock_move(osv.Model):
         result = super(stock_move, self)._prepare_picking_assign(cr, uid, move, context=context)
         result.update({'order_reference': move.group_id and move.group_id.order_reference or False})
         return result
+
+    def _create_backorder(self, cr, uid, picking, backorder_moves=[], context=None):
+        result = super(stock_picking, self)._create_backorder(cr, uid, picking, backorder_moves=[], context=None):
+        result.order_reference = picking.order_reference
+        return result
