@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="view_quotation_tree_franco" model="ir.ui.view">
+            <field name="name">sale.order.tree.franco</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+            <field name="arch" type="xml">
+                <xpath expr="/search/filter[@string='Done']" position="after">
+                    <filter name="franco_check" string="Franco Enabled" domain="[('franco_check','=',True)]" help="Orders with Franco Check enabled" groups="product.group_sale_pricelist"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_order_form_franco" model="ir.ui.view">
+            <field name="name">sale.order.form.franco</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_policy']" position="after">
+                    <field name="franco_check" groups="product.group_sale_pricelist"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</openerp>
