@@ -74,6 +74,7 @@ class SaleOrder(models.Model):
         _logger.debug("get commitment date")
         res = super(SaleOrder, self)._get_commitment_date(cr, uid, ids, name, arg, context)
         for order in self.browse(cr, uid, ids, context=context):
+            if order.state == 'cancel': continue
             if order.fixed_delivery_day:
                 date_format = DEFAULT_SERVER_DATETIME_FORMAT
                 res_date = datetime.strptime(res[order.id], date_format)
