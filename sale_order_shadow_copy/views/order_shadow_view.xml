@@ -2,15 +2,15 @@
 <openerp>
     <data>
 
-        <record id="view_sales_config" model="ir.ui.view">
+        <record id="view_shadow_copy_form" model="ir.ui.view">
             <field name="name">Sale Shadow Copy Form</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//page[@string='Order Lines']" position="after">
                     <page string="Shadow Copy">
-                        <button name="copy_to_shadow" states="draft" string="Fill" attrs="{'invisible': [('order_shadow_line', '=', True)]}" type="object"/>  
-                        <button name="copy_from_shadow" states="draft" string="Restore" attrs="{'invisible': [('order_shadow_line', '=', False)]}" type="object"/>  
+                        <button name="copy_to_shadow" states="draft" string="Fill" attrs="{'invisible': [('order_shadow_line', '=', True)]}" type="object"/>
+                        <button name="copy_from_shadow" states="draft" string="Restore" attrs="{'invisible': [('order_shadow_line', '=', False)]}" type="object"/>
                       <field name="order_shadow_line">
                         <tree string="Sales Order Shadow Copy">
                           <field name="sequence" invisible="1"/>
