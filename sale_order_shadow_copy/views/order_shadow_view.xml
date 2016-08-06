@@ -2,7 +2,7 @@
 <openerp>
     <data>
 
-        <record id="view_sales_config" model="ir.ui.view">
+        <record id="view_shadow_copy_form" model="ir.ui.view">
             <field name="name">Sale Shadow Copy Form</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
