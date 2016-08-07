@@ -17,7 +17,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from openerp import models, fields, api
+from openerp import models, fields, api, _
+from openerp.exceptions import except_orm, Warning, RedirectWarning
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -31,36 +32,49 @@ class SaleOrder(models.Model):
     @api.multi
     def update_so_lines_from_bomify(self):
         if self.order_bom_line:
+            missingproducts = []
             #check if all components for all BOM lines are present in the sales order
             allcomponentquantitiesfound = True
             for line in self.order_bom_line:
+                bomfound = False
                 for component in line.product_id.bom_ids.bom_line_ids:
                     componentquantityfound = False
 
                     for orderline in self.order_line:
                         if orderline.product_id.id == component.product_id.id:
+                            bomfound = True
                             if orderline.product_uom_qty < component.product_qty*line.product_uom_qty:
-                                _logger.debug("ohoh, not enough components found!")
-                                allcomponentquantitiesfound = False
-                            
-                            componentquantityfound = True
-                            #orderline.unlink()
-                            #import pdb; pdb.set_trace()
-                            _logger.debug("ok, component found, sufficient qty")
+                                errormessage = str(line.product_id.name + ' missing ' + str(int(component.product_qty*line.product_uom_qty-orderline.product_uom_qty)) + "x " + component.product_id.name)
+                                missingproducts.append(errormessage)
+                                missingproducts.append('\n')
+                                componentquantityfound = False
+                            else:
+                                _logger.debug("ok, component found, sufficient qty")
+                                componentquantityfound = True
 
+                        
                     if componentquantityfound == False:
                         _logger.debug("insufficient components for one of the BOM's in order!")
                         allcomponentquantitiesfound = False
+
+                if bomfound == False:
+                    errormessage = str(line.product_id.name + ' missing all products ' + '\n')
+                    missingproducts.append(errormessage)
             
             if allcomponentquantitiesfound == False:
                 _logger.debug("not all BOM lines found :(")
+                _logger.debug("errormessage: %s", missingproducts)
+                raise except_orm(_('Could not complete Reverse BOM!'),_('%s') % ''.join(missingproducts))
                 return
+
 
             for line in self.order_bom_line:
                 for component in line.product_id.bom_ids.bom_line_ids:
                     for orderline in self.order_line:
                         if orderline.product_id.id == component.product_id.id:
                             orderline.write({'product_uom_qty': orderline.product_uom_qty - component.product_qty*line.product_uom_qty, 'product_uos_qty': orderline.product_uos_qty - component.product_qty*line.product_uom_qty})
+                            if (orderline.product_uom_qty - component.product_qty*line.product_uom_qty) <= 0:
+                                orderline.unlink()
 
                 
                 # ADD BOM Products from BOM to SO
