@@ -42,6 +42,7 @@ the warehouse_sent attribute (edi module) is empty.
         'stock',
         'sale',
         'sale_order_dates',
+        'sale_address_chainer',
         'sale_stock',
         'edi_tools',
     ],
