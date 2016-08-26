@@ -22,6 +22,7 @@ from openerp.exceptions import except_orm, Warning, RedirectWarning
 import logging
 _logger = logging.getLogger(__name__)
 
+
 class SaleOrder(models.Model):
     _name = "sale.order"
     _inherit = "sale.order"
@@ -30,50 +31,59 @@ class SaleOrder(models.Model):
     order_bomified = fields.Boolean(string="Bomified",readonly=True)
 
     @api.multi
-    def update_so_lines_from_bomify(self):
+    def _validate_bom_lines(self):
+        missing_products = []
+        all_component_quantities_found = True
+        for line in self.order_bom_line:
+            bom_found = False
+            for component in line.product_id.bom_ids.bom_line_ids:
+                component_quantity_found = False
+                component_found = False
+                for orderline in self.order_line:
+                    if orderline.product_id.id == component.product_id.id:
+                        bom_found = True
+                        component_found = True
+                        if orderline.product_uom_qty < component.product_qty*line.product_uom_qty:
+                            errormessage = str(line.product_id.name + ' missing ' + str(int(component.product_qty*line.product_uom_qty-orderline.product_uom_qty)) + "x " + component.product_id.name)
+                            missing_products.append(errormessage)
+                            missing_products.append('\n')
+                            component_quantity_found = False
+                        else:
+                            _logger.debug("ok, component found, sufficient qty")
+                            component_quantity_found = True
+                
+                if component_found == False and bom_found == True:
+                    errormessage = str(line.product_id.name + ' missing ' + str(int(component.product_qty*line.product_uom_qty)) + "x " + component.product_id.name)
+                    missing_products.append(errormessage)
+                    missing_products.append('\n')
+
+                if component_quantity_found == False:
+                    _logger.debug("insufficient components for one of the BOM's in order!")
+                    all_component_quantities_found = False
+
+            if bom_found == False:
+                errormessage = str(line.product_id.name + ' missing all products ' + '\n')
+                missing_products.append(errormessage)
+        
+        if all_component_quantities_found == False:
+            _logger.debug("not all BOM lines found :(")
+            _logger.debug("errormessage: %s", missing_products)
+            raise except_orm(_('Could not complete Reverse BOM!'),_('%s') % ''.join(missing_products))
+        
+    @api.multi
+    def update_so_lines_from_bomify(self):        
         if self.order_bom_line:
-            missingproducts = []
-            #check if all components for all BOM lines are present in the sales order
-            allcomponentquantitiesfound = True
-            for line in self.order_bom_line:
-                bomfound = False
-                for component in line.product_id.bom_ids.bom_line_ids:
-                    componentquantityfound = False
-
-                    for orderline in self.order_line:
-                        if orderline.product_id.id == component.product_id.id:
-                            bomfound = True
-                            if orderline.product_uom_qty < component.product_qty*line.product_uom_qty:
-                                errormessage = str(line.product_id.name + ' missing ' + str(int(component.product_qty*line.product_uom_qty-orderline.product_uom_qty)) + "x " + component.product_id.name)
-                                missingproducts.append(errormessage)
-                                missingproducts.append('\n')
-                                componentquantityfound = False
-                            else:
-                                _logger.debug("ok, component found, sufficient qty")
-                                componentquantityfound = True
-
-                        
-                    if componentquantityfound == False:
-                        _logger.debug("insufficient components for one of the BOM's in order!")
-                        allcomponentquantitiesfound = False
-
-                if bomfound == False:
-                    errormessage = str(line.product_id.name + ' missing all products ' + '\n')
-                    missingproducts.append(errormessage)
+            self.copy_to_shadow() # if exists, no new copy will be made
+            self._validate_bom_lines()
+            self.order_bomified = True
             
-            if allcomponentquantitiesfound == False:
-                _logger.debug("not all BOM lines found :(")
-                _logger.debug("errormessage: %s", missingproducts)
-                raise except_orm(_('Could not complete Reverse BOM!'),_('%s') % ''.join(missingproducts))
-                return
-
-
             for line in self.order_bom_line:
                 for component in line.product_id.bom_ids.bom_line_ids:
                     for orderline in self.order_line:
                         if orderline.product_id.id == component.product_id.id:
                             orderline.write({'product_uom_qty': orderline.product_uom_qty - component.product_qty*line.product_uom_qty, 'product_uos_qty': orderline.product_uos_qty - component.product_qty*line.product_uom_qty})
-                            if (orderline.product_uom_qty - component.product_qty*line.product_uom_qty) <= 0:
+                            _logger.debug("New orderline Qty for %s: %s", orderline.name, orderline.product_uom_qty)
+                            if orderline.product_uom_qty <= 0:
                                 orderline.unlink()
 
                 
@@ -107,9 +117,8 @@ class SaleOrderBomLine(models.Model):
                 if component.product_id.id == line.product_id.id:
                     prod_price += line.price_unit*component.product_qty
                     _logger.debug("price incremented by order line: %s", line.price_unit*component.product_qty)
-                else:
-                    prod_price += component.product_id.lst_price*component.product_qty
-                    _logger.debug("price incremented by: %s", component.product_id.lst_price*component.product_qty)
+            #prod_price += component.product_id.lst_price*component.product_qty
+            #_logger.debug("price incremented by: %s", component.product_id.lst_price*component.product_qty)
         self.name = prod.name
         self.product_uom_qty = 1
         self.product_uos_qty = 1
