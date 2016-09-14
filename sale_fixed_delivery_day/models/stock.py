@@ -19,9 +19,9 @@ class stock_picking(osv.Model):
     # default fixed_delivery_day based on the partner (if provided)
     def create(self, cr, uid, vals, context=None):
         partner_obj = self.pool.get('res.partner')
-        partner_id = vals.get('partner_id', None)
-        if partner_id:
-            fixed_delivery_day = self._get_partner_fixed_delivery_day(cr, uid, partner_id, context)
+        sale_partner_id = vals.get('sale_partner_id', None)
+        if sale_partner_id:
+            fixed_delivery_day = self._get_partner_fixed_delivery_day(cr, uid, sale_partner_id, context)
             if fixed_delivery_day: vals.update({'fixed_delivery_day': fixed_delivery_day})
         return super(stock_picking, self).create(cr, uid, vals, context=context)
 
