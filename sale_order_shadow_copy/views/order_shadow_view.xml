@@ -9,8 +9,8 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@string='Order Lines']" position="after">
                     <page string="Shadow Copy">
-                        <button name="copy_to_shadow" states="draft" string="Fill" attrs="{'invisible': [('order_shadow_line', '=', True)]}" type="object"/>  
-                        <button name="copy_from_shadow" states="draft" string="Restore" attrs="{'invisible': [('order_shadow_line', '=', False)]}" type="object"/>  
+                        <button name="copy_to_shadow" states="draft" string="Fill" attrs="{'invisible': [('order_shadow_line', '=', True)]}" type="object"/>
+                        <button name="copy_from_shadow" states="draft" string="Restore" attrs="{'invisible': [('order_shadow_line', '=', False)]}" type="object"/>
                       <field name="order_shadow_line">
                         <tree string="Sales Order Shadow Copy">
                           <field name="sequence" invisible="1"/>
